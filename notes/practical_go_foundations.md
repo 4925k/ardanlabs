@@ -1,4 +1,4 @@
-# PRACTICAL GO FOUNDATIONS
+# EP 1
 
 - fmt runs before go run.
 - run debugger during development
@@ -12,3 +12,11 @@
 - go is mostly written in go 
     - runtime has some parts in go assembly
         - go assembly converts to assembly based on machine
+
+# EP 2
+
+- string -> struct -> pointer to string + length of string
+- utf8 -> most popular character encoding 
+- byte (uint8)
+- rune (int32)
+
