@@ -1,5 +1,4 @@
 # EP 1
-
 - fmt runs before go run.
 - run debugger during development
 - `go build .` build binaries
@@ -14,9 +13,12 @@
         - go assembly converts to assembly based on machine
 
 # EP 2
-
 - string -> struct -> pointer to string + length of string
 - utf8 -> most popular character encoding 
 - byte (uint8)
 - rune (int32)
 
+# EP 3
+- headers are case insensitive
+- servers can respond based on whether the request generates from a user or a machine
+    - users can get pretty json while machines may get compact json
