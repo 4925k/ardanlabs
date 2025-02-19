@@ -22,3 +22,8 @@
 - headers are case insensitive
 - servers can respond based on whether the request generates from a user or a machine
     - users can get pretty json while machines may get compact json
+
+# EP 4
+- defer file.Close() -> to avoid hitting system file description limit
+- talks about  variable shadowing
+- io.Reader has one function Read()
