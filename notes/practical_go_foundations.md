@@ -27,3 +27,6 @@
 - defer file.Close() -> to avoid hitting system file description limit
 - talks about  variable shadowing
 - io.Reader has one function Read()
+
+# EP 5
+- integers in go is values, not pointers
