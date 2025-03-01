@@ -5,3 +5,6 @@ pgf-hw-run:
 
 pgf-slices-run:
 	go run ./practical_go_foundations/slices/
+
+pgf-slices-game:
+	go run ./practical_go_foundations/game/

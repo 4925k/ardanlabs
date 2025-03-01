@@ -42,6 +42,10 @@ func main() {
 }
 
 func median(values []float64) float64 {
+	if len(values) == 0 {
+		return 0
+	}
+
 	// copy in order to avoid changing the original array
 	nums := make([]float64, len(values))
 	copy(nums, values)

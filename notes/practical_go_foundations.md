@@ -25,8 +25,15 @@
 
 # EP 4
 - defer file.Close() -> to avoid hitting system file description limit
-- talks about  variable shadowing
+- variable shadowing
 - io.Reader has one function Read()
 
 # EP 5
 - integers in go is values, not pointers
+
+# EP 6
+- zero vs missing value is hard to distinguish
+    - cant tell if it was initialized to zero or user put zero
+- local variables are stored on stack
+- global variables are stored on heap
+- ```go build -gcflags=-m``` to show memory usage
