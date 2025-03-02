@@ -37,3 +37,7 @@
 - local variables are stored on stack
 - global variables are stored on heap
 - ```go build -gcflags=-m``` to show memory usage
+
+# EP 7
+- bigger the interface, smaller the abstraction
+- Rule of thumb: DONT USE ANY

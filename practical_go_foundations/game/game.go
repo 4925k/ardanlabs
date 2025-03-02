@@ -19,6 +19,7 @@ type Item struct {
 type Player struct {
 	Name string
 	Item // Embed
+	Keys []Key
 }
 
 func main() {
@@ -51,7 +52,71 @@ func main() {
 	ms := []mover{&i2, &p1, i4} // cant use i1 here because it is a value.
 	moveAll(ms, 0, 0)
 
+	k := Jade
+	fmt.Printf("k: %s\n", k)
+
+	err = p1.FoundKey(k)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("p1.Key: %#v\n", p1.Keys)
+
+	err = p1.FoundKey(invalidKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// time.Time imports json.Marshaler interface
+	// json.NewEncoder(os.Stdout).Encode(time.Now())
 }
+
+const (
+	Jade Key = iota + 1
+	Copper
+	Crystal
+	invalidKey // internal
+)
+
+// Implement fmt.Stringer interface
+func (k Key) String() string {
+	switch k {
+	case Jade:
+		return "Jade"
+	case Copper:
+		return "Copper"
+	case Crystal:
+		return "Crystal"
+	}
+
+	return fmt.Sprintf("unknown key: %d", k)
+}
+
+// FoundKey will add k to Key if its not there
+// error if k is not one of the known keys
+func (p *Player) FoundKey(k Key) error {
+	if k < Jade || k >= invalidKey {
+		return fmt.Errorf("unknown key: %d", k)
+	}
+
+	if !p.containsKey(k) {
+		p.Keys = append(p.Keys, k)
+	}
+
+	return nil
+}
+
+func (p *Player) containsKey(k Key) bool {
+	for i := range p.Keys {
+		if p.Keys[i] == k {
+			return true
+		}
+	}
+
+	return false
+}
+
+type Key byte
 
 func moveAll(ms []mover, x, y int) {
 	for _, m := range ms {
@@ -64,11 +129,14 @@ type mover interface {
 	// Move(int, int)
 }
 
-// NewItem returns a pointer to an Item
-// func NewItem(x, y int) Item
-// func NewItem(x, y int) *Item
-// func NewItem(x, y int) (Item, error)
-func NewItem(x, y int) (*Item, error) { // best practices
+/*
+NewItem returns a pointer to an Item
+func NewItem(x, y int) Item
+func NewItem(x, y int) *Item
+func NewItem(x, y int) (Item, error)
+The following signature is the best practice
+*/
+func NewItem(x, y int) (*Item, error) {
 	if x < 0 || y < 0 || x > maxX || y > maxY {
 		return nil, fmt.Errorf("invalid position: %d, %d", x, y)
 	}
