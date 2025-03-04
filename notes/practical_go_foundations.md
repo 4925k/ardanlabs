@@ -47,3 +47,12 @@
 - alawys comment regexp and maps with what they are used for
 - zero vs nil values in maps by ```value, ok := map[key]```
 - maps are hash maps not ordered
+
+# EP 9
+- using time.Sleep means you're doing something in a bad way
+- channel semantics
+    - send & recieve will block until opposite operation (*)
+    - recieve from closed channel will return the zero value without blocking
+    - sending to a closed channel will panic
+    - closing a closed channel will panic
+    - send/receive to a nil channel will block forever
