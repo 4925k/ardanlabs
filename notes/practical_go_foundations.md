@@ -41,3 +41,9 @@
 # EP 7
 - bigger the interface, smaller the abstraction
 - Rule of thumb: DONT USE ANY
+
+# EP 8
+- don't panic
+- alawys comment regexp and maps with what they are used for
+- zero vs nil values in maps by ```value, ok := map[key]```
+- maps are hash maps not ordered
