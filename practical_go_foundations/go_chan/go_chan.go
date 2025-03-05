@@ -69,4 +69,31 @@ func main() {
 
 	// sending on closed channels
 	// ch <- "hi" // PANIC: sending on closed channel
+
+	values := []int{15, 10, 5, 0, -5}
+	fmt.Println(sleepSort(values))
+
+	time.Sleep(1 * time.Second)
+}
+
+// For every value 'n' in values, spin a go routine that will
+// - sleep n milliseconds
+// - send n over a channel
+func sleepSort(values []int) []int {
+	ch := make(chan int)
+
+	for _, v := range values {
+		go func(n int) {
+			time.Sleep(time.Duration(n) * time.Millisecond)
+			ch <- n
+		}(v)
+	}
+
+	var ret []int
+	for range values {
+		n := <-ch
+		ret = append(ret, n)
+	}
+
+	return ret
 }

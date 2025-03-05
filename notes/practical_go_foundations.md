@@ -56,3 +56,7 @@
     - sending to a closed channel will panic
     - closing a closed channel will panic
     - send/receive to a nil channel will block forever
+
+# EP 10
+- go routines and channels
+- channels can be <-chan or chan<- or chan. 
