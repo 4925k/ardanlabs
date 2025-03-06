@@ -60,3 +60,8 @@
 # EP 10
 - go routines and channels
 - channels can be <-chan or chan<- or chan. 
+
+# EP 11
+- waitgroups
+- sync.Once to run something only one time
+- cost of race detection is very high
