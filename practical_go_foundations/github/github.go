@@ -1,15 +1,20 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 func main() {
-	name, count, err := githubInfo("4925k")
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	name, count, err := githubInfo(ctx, "4925k")
 	if err != nil {
 		log.Fatalf("getting github info: %v", err)
 	}
@@ -18,8 +23,15 @@ func main() {
 }
 
 // githubInfo returns the name and number of public repos of a github user
-func githubInfo(username string) (string, int, error) {
-	resp, err := http.Get(fmt.Sprintf("https://api.github.com/users/%s", url.PathEscape(username)))
+func githubInfo(ctx context.Context, username string) (string, int, error) {
+	// resp := http.Get("https://api.github.com/users/" + url.PathEscape(username)) // WITHOUT CONTEXT
+	url := fmt.Sprintf("https://api.github.com/users/%s", url.PathEscape(username))
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return "", 0, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", 0, err
 	}

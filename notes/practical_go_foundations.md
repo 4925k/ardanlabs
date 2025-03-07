@@ -65,3 +65,9 @@
 - waitgroups
 - sync.Once to run something only one time
 - cost of race detection is very high
+
+# EP 12
+- contexts
+- go routine leaks when context cancel is not being handled properly
+    - use buffered channel to avoid go routine leaks
+- use contexts on network requests to cancel them
