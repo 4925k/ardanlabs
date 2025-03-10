@@ -71,3 +71,12 @@
 - go routine leaks when context cancel is not being handled properly
     - use buffered channel to avoid go routine leaks
 - use contexts on network requests to cancel them
+
+# EP 13 = project engineering
+- go project basics, docs
+- look into .doc file of packages to see how to use docs for yourself
+- examples and test
+    - examples need to have ```Output: [expected]``` to match the expected output
+    - test needs to have ```func TestName(t *testing.T)```
+- go vendor to avoid dependency issues
+- testify pacakge for making tests easier
