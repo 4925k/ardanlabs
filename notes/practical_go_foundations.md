@@ -80,3 +80,8 @@
     - test needs to have ```func TestName(t *testing.T)```
 - go vendor to avoid dependency issues
 - testify pacakge for making tests easier
+
+# EP 14 
+- table testing 
+    - toml for loading table test cases
+- code structuring and modules

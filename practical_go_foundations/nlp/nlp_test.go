@@ -26,7 +26,7 @@ func TestTokenize(t *testing.T) {
 		want []string
 	}{
 		{
-			name: "hello world",
+			name: "hello world ",
 			args: args{
 				text: "hello world",
 			},
