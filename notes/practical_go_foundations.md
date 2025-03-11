@@ -81,7 +81,11 @@
 - go vendor to avoid dependency issues
 - testify pacakge for making tests easier
 
-# EP 14 
+# EP 14 - testing
 - table testing 
     - toml for loading table test cases
 - code structuring and modules
+
+# EP 15 - project structure
+- fuzz testing
+- hey for load testing endpoints

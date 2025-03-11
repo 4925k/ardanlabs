@@ -3,6 +3,7 @@ package nlp_test
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/4925k/practical_go_foundations/nlp"
@@ -48,4 +49,17 @@ func TestTokenize(t *testing.T) {
 			}
 		})
 	}
+}
+
+func FuzzToken(f *testing.F) {
+	f.Fuzz(func(t *testing.T, text string) {
+		tokens := nlp.Tokenize(text)
+		lText := strings.ToLower(text)
+		for _, tok := range tokens {
+			if !strings.Contains(lText, tok) {
+				t.Fatal(tok)
+			}
+		}
+	})
+
 }
