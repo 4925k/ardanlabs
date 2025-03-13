@@ -89,3 +89,9 @@
 # EP 15 - project structure
 - fuzz testing
 - hey for load testing endpoints
+
+# EP 16 - logging
+- using 3rd party routers
+- testing routes with httptest
+- dependency injection using structures and methods
+- metrics using expvar package

@@ -7,42 +7,76 @@ import (
 	"log"
 	"net/http"
 
+	_ "expvar"
+
 	"github.com/4925k/practical_go_foundations/nlp"
+	"github.com/4925k/practical_go_foundations/nlp/stemmer"
+	"github.com/gorilla/mux"
 )
 
 func main() {
+	// LOGGING
+	logger := log.New(log.Writer(), "nlp: ", log.LstdFlags|log.Lshortfile)
+	s := Server{
+		logger: logger, // DEPENDENCY INJECTION
+	}
+
 	// ROUTING
 
 	// /health is an exact mathc
 	// /health/ is a prefix match
-	http.HandleFunc("/health", healthHandler)
-	http.HandleFunc("/tokenize", tokenizeHandler)
+	// http.HandleFunc("/health", healthHandler)
+	// http.HandleFunc("/tokenize", tokenizeHandler)
+
+	// USING A 3rd PARTY ROUTER
+	r := mux.NewRouter()
+	r.HandleFunc("/health", s.healthHandler).Methods(http.MethodGet)
+	r.HandleFunc("/tokenize", s.tokenizeHandler).Methods(http.MethodPost)
+	r.HandleFunc("/stem/{word}", s.stemHandler).Methods(http.MethodGet)
+	http.Handle("/", r)
 
 	// SERVER
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	addr := ":8080"
+	s.logger.Printf("server listening on %s", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)
 	}
 }
 
+type Server struct {
+	logger *log.Logger
+}
+
+func (s *Server) stemHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	word := vars["word"]
+
+	stem := stemmer.Stem(word)
+
+	fmt.Fprintln(w, stem)
+}
+
 // healthHandler returns "OK"
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	// w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "OK")
 }
 
 // tokenizeHandler tokenizes text
-func tokenizeHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) tokenizeHandler(w http.ResponseWriter, r *http.Request) {
 	// VALIDATION
-	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
+	// NOTE: handled by gorilla mux
+	// if r.Method != http.MethodPost {
+	// 	http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	// 	return
+	// }
 
 	// REQUEST PARSING
 	defer r.Body.Close()
 	rdr := io.LimitReader(r.Body, 1_000_000)
 	data, err := io.ReadAll(rdr)
 	if err != nil {
+		s.logger.Printf("error reading request body: %v", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
