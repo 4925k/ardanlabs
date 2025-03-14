@@ -23,3 +23,8 @@ go.work.sum
 
 # env file
 .env
+
+
+# reference repos
+software_design_with_kubernetes/service4.1-video
+software_design_with_kubernetes/service_og
