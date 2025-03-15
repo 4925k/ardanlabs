@@ -10,6 +10,8 @@ import (
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/foundation/logger"
 )
 
+var build = "develop "
+
 func main() {
 	// LOGGING
 	var log *logger.Logger
@@ -39,7 +41,7 @@ func main() {
 func run(ctx context.Context, log *logger.Logger) error {
 	// --------------------------------------------------------------------------------------
 	// GOMAXPROCS
-	log.Info(ctx, "startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
+	log.Info(ctx, "startup", "GOMAXPROCS", runtime.GOMAXPROCS(0), "buidl", build)
 
 	// --------------------------------------------------------------------------------------
 	// SHUTDOWN

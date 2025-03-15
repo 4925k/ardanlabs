@@ -16,11 +16,14 @@ KIND_CLUSTER    := dp-cluster
 NAMESPACE       := sales-system
 SALES_APP       := sales
 AUTH_APP        := auth
-BASE_IMAGE_NAME := localhost/ardanlabs
+BASE_IMAGE_NAME := localhost/4925k
 VERSION         := 0.0.1
 SALES_IMAGE     := $(BASE_IMAGE_NAME)/$(SALES_APP):$(VERSION)
 METRICS_IMAGE   := $(BASE_IMAGE_NAME)/metrics:$(VERSION)
 AUTH_IMAGE      := $(BASE_IMAGE_NAME)/$(AUTH_APP):$(VERSION)
+
+
+# VERSION       := "0.0.1-$(shell git rev-parse --short HEAD)"
 
 run: 
 	go run app/services/sales-api/main.go | go run app/tooling/logfmt/main.go
@@ -39,3 +42,19 @@ dev-up:
 
 dev-down:
 	kind delete cluster --name $(KIND_CLUSTER)
+
+dev-status:
+	kubectl get pods -o wide --all-namespaces --watch
+
+# ==============================================================================
+# Building containers
+
+build: sales
+
+sales:
+	docker build \
+		-f zarf/docker/dockerfile.sales \
+		-t $(SALES_IMAGE) \
+		--build-arg BUILD_REF=$(VERSION) \
+		--build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+		.
