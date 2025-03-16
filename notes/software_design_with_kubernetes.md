@@ -11,3 +11,6 @@
     - levels to be skipped. dont have time to change log levels on production when required.
 - polymorphism -> a peice of code changes its behavior depending on the concrete type of data it is working on
 - always return concrete values
+
+# EP 4
+- kubernetes setup and deployment

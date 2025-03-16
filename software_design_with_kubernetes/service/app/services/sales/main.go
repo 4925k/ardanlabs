@@ -26,7 +26,7 @@ func main() {
 		return ""
 	}
 
-	log = logger.NewWithEvents(os.Stdout, logger.LevelInfo, "SALES_API", traceIDFn, events)
+	log = logger.NewWithEvents(os.Stdout, logger.LevelInfo, "SALES", traceIDFn, events)
 
 	// --------------------------------------------------------------------------------------
 	// RUN
@@ -41,7 +41,7 @@ func main() {
 func run(ctx context.Context, log *logger.Logger) error {
 	// --------------------------------------------------------------------------------------
 	// GOMAXPROCS
-	log.Info(ctx, "startup", "GOMAXPROCS", runtime.GOMAXPROCS(0), "buidl", build)
+	log.Info(ctx, "startup", "GOMAXPROCS", runtime.GOMAXPROCS(0), "build", build)
 
 	// --------------------------------------------------------------------------------------
 	// SHUTDOWN
