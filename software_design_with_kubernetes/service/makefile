@@ -26,7 +26,10 @@ AUTH_IMAGE      := $(BASE_IMAGE_NAME)/$(AUTH_APP):$(VERSION)
 # VERSION       := "0.0.1-$(shell git rev-parse --short HEAD)"
 
 run: 
-	go run app/services/sales-api/main.go | go run app/tooling/logfmt/main.go
+	go run app/services/sales/main.go | go run app/tooling/logfmt/main.go
+
+run-help:
+	go run app/service/sales/main.go --help | go run app/tooling/logfmt/main.go
 
 
 # ==============================================================================
@@ -90,3 +93,15 @@ dev-describe-sales:
 
 
 #===============================================================================
+# Modules Support
+
+tidy:
+	go mod tidy
+	go mod vendor	
+
+
+#===============================================================================
+# Metrics and Tracing
+
+metrics-view-sc:
+	expvarmon -ports="localhost:4000" -vars="build,requests,goroutiens,errors,panics,mem:memstats.Alloc"
