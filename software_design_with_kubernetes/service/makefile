@@ -105,3 +105,7 @@ tidy:
 
 metrics-view-sc:
 	expvarmon -ports="localhost:4000" -vars="build,requests,goroutiens,errors,panics,mem:memstats.Alloc"
+
+
+curl:
+	curl -il http://localhost:3000/hack

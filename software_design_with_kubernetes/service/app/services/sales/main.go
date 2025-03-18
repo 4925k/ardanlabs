@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	v1 "github.com/4925k/ardanlabs/software_design_with_kubernetes/service/business/web/v1"
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/business/web/v1/debug"
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/foundation/logger"
 	"github.com/ardanlabs/conf/v3"
@@ -110,14 +111,55 @@ func run(ctx context.Context, log *logger.Logger) error {
 	}()
 
 	// --------------------------------------------------------------------------------------
-	// SHUTDOWN
+	// API SERVICE
+
+	log.Info(ctx, "startup", "status", "initializing V1 API Support")
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
-	sig := <-shutdown
 
-	log.Info(ctx, "shutdown", "status", "shutdown started", "signal", sig)
-	defer log.Info(ctx, "shutdown", "status", "shutdown complete", "signal", sig)
+	cfgMux := v1.APIMuxConfig{
+		Build:    build,
+		Shutdown: shutdown,
+		Log:      log,
+	}
+
+	apiMux := v1.APIMux(cfgMux)
+
+	api := http.Server{
+		Addr:         cfg.Web.APIHost,
+		Handler:      apiMux,
+		ReadTimeout:  cfg.Web.ReadTimeout,
+		WriteTimeout: cfg.Web.WriteTimeout,
+		IdleTimeout:  cfg.Web.IdleTimeout,
+		ErrorLog:     logger.NewStdLogger(log, logger.LevelError),
+	}
+
+	serverErrors := make(chan error, 1)
+
+	go func() {
+		log.Info(ctx, "startup", "status", "api router started", "host", api.Addr)
+		serverErrors <- api.ListenAndServe()
+	}()
+
+	// --------------------------------------------------------------------------------------
+	// SHUTDOWN
+
+	select {
+	case err := <-serverErrors:
+		return fmt.Errorf("listen and serve: %w", err)
+	case sig := <-shutdown:
+		log.Info(ctx, "shutdown", "status", "shutdown started", "signal", sig)
+		defer log.Info(ctx, "shutdown", "status", "shutdown complete", "signal", sig)
+
+		ctx, cancel := context.WithTimeout(ctx, cfg.Web.ShutdownTimeout)
+		defer cancel()
+
+		if err := api.Shutdown(ctx); err != nil {
+			api.Close()
+			return fmt.Errorf("could not stop server gracefully: %w", err)
+		}
+	}
 
 	return nil
 }
