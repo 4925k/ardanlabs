@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/app/services/sales/v1/handlers"
 	v1 "github.com/4925k/ardanlabs/software_design_with_kubernetes/service/business/web/v1"
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/business/web/v1/debug"
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/foundation/logger"
@@ -124,7 +125,7 @@ func run(ctx context.Context, log *logger.Logger) error {
 		Log:      log,
 	}
 
-	apiMux := v1.APIMux(cfgMux)
+	apiMux := v1.APIMux(cfgMux, handlers.Routes{})
 
 	api := http.Server{
 		Addr:         cfg.Web.APIHost,

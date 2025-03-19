@@ -1,13 +1,11 @@
 package v1
 
 import (
-	"net/http"
 	"os"
 
-	"github.com/dimfeld/httptreemux"
-
-	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/app/services/sales/v1/handlers/hack"
+	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/business/web/v1/mid"
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/foundation/logger"
+	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/foundation/web"
 )
 
 type APIMuxConfig struct {
@@ -16,12 +14,16 @@ type APIMuxConfig struct {
 	Log      *logger.Logger
 }
 
-func APIMux(cfg APIMuxConfig) http.Handler {
+type RouterAddr interface {
+	Add(app *web.App, cfg APIMuxConfig)
+}
 
-	mux := httptreemux.NewContextMux()
+func APIMux(cfg APIMuxConfig, routeAddr RouterAddr) *web.App {
 
-	mux.Handle(http.MethodGet, "/hack", hack.Hack)
+	app := web.NewApp(cfg.Shutdown, mid.Logger(cfg.Log))
 
-	return mux
+	routeAddr.Add(app, cfg)
+
+	return app
 
 }
