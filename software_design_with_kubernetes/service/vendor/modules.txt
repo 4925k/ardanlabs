@@ -4,3 +4,6 @@ github.com/ardanlabs/conf/v3
 # github.com/dimfeld/httptreemux v5.0.1+incompatible
 ## explicit
 github.com/dimfeld/httptreemux
+# github.com/google/uuid v1.6.0
+## explicit
+github.com/google/uuid

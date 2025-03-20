@@ -16,6 +16,7 @@ import (
 	v1 "github.com/4925k/ardanlabs/software_design_with_kubernetes/service/business/web/v1"
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/business/web/v1/debug"
 	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/foundation/logger"
+	"github.com/4925k/ardanlabs/software_design_with_kubernetes/service/foundation/web"
 	"github.com/ardanlabs/conf/v3"
 )
 
@@ -32,7 +33,7 @@ func main() {
 	}
 
 	traceIDFn := func(ctx context.Context) string {
-		return ""
+		return web.GetTraceID(ctx)
 	}
 
 	log = logger.NewWithEvents(os.Stdout, logger.LevelInfo, "SALES", traceIDFn, events)
