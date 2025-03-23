@@ -31,6 +31,9 @@ run:
 run-help:
 	go run app/service/sales/main.go --help | go run app/tooling/logfmt/main.go
 
+admin: 
+	go run app/tooling/sales-admin/main.go
+
 
 # ==============================================================================
 # Running from within k8s/kind
@@ -112,3 +115,11 @@ curl:
 
 load:
 	hey -m GET -c 100 -n 100000 "http://localhost:3000/hack"
+
+
+#==============================================================================
+
+# RSA Keys
+# 	To generate a private/public key PEM file.
+# 	$ openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
+# 	$ openssl rsa -pubout -in private.pem -out public.pem
