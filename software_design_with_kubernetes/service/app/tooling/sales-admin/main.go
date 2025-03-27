@@ -1,16 +1,27 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	_ "embed"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/open-policy-agent/opa/rego"
+)
+
+// Core OPA policies
+var (
+	//go:embed rego/authentication.rego
+	opaAuthentication string
 )
 
 func main() {
@@ -21,7 +32,8 @@ func main() {
 }
 
 func genToken() error {
-	privateKey, err := genKey()
+	// generate a new private key
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return fmt.Errorf("generating key: %w", err)
 	}
@@ -61,6 +73,101 @@ func genToken() error {
 	}
 
 	fmt.Println("token:", str)
+
+	// ----------------------------------------------------------------------------------
+
+	parser := jwt.NewParser(jwt.WithValidMethods([]string{jwt.SigningMethodRS256.Name}))
+
+	keyFunc := func(t *jwt.Token) (any, error) {
+		return &privateKey.PublicKey, nil
+	}
+
+	var claims2 struct {
+		jwt.RegisteredClaims
+		Roles []string
+	}
+
+	tkn, err := parser.ParseWithClaims(str, &claims2, keyFunc)
+	if err != nil {
+		return fmt.Errorf("parsing token: %w", err)
+	}
+
+	if !tkn.Valid {
+		return errors.New("token invalid")
+	}
+
+	fmt.Println("Signature Validated")
+	fmt.Printf("Parsed claims: %#v\n", claims2)
+
+	// -----------------------------------------------------------------------------------
+
+	var claims3 struct {
+		jwt.RegisteredClaims
+		Roles []string
+	}
+
+	_, _, err = parser.ParseUnverified(str, &claims3)
+	if err != nil {
+		return fmt.Errorf("parsing token: %w", err)
+	}
+
+	// marshal the public key from private key to PKIX
+	asn1Bytes, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
+	if err != nil {
+		return fmt.Errorf("marshaling public key: %w", err)
+	}
+
+	// construct a PEM block for the public key
+	publicBlock := &pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: asn1Bytes,
+	}
+
+	// write the public key to buffer
+	var b bytes.Buffer
+	if err := pem.Encode(&b, publicBlock); err != nil {
+		return fmt.Errorf("encoding to public file: %w", err)
+	}
+
+	input := map[string]any{
+		"Key":   b.String(),
+		"Token": str,
+	}
+
+	if err := opaPolicyEvaluation(context.Background(), opaAuthentication, input); err != nil {
+		return fmt.Errorf("authentication failed: %w", err)
+	}
+
+	fmt.Println("VALIDATED BY REGO")
+	fmt.Printf("Parsed claims: %#v\n", claims3)
+
+	return nil
+}
+
+func opaPolicyEvaluation(ctx context.Context, opapolicy string, input any) error {
+	const opaPackage string = "dibek.rego"
+	const rule string = "auth"
+
+	query := fmt.Sprintf("x = data.%s.%s", opaPackage, rule)
+
+	q, err := rego.New(rego.Query(query), rego.Module("policy.rego", opapolicy)).PrepareForEval(ctx)
+	if err != nil {
+		return err
+	}
+
+	results, err := q.Eval(ctx, rego.EvalInput(input))
+	if err != nil {
+		return fmt.Errorf("query: %w", err)
+	}
+
+	if len(results) == 0 {
+		return errors.New("no results")
+	}
+
+	result, ok := results[0].Bindings["x"].(bool)
+	if !ok || !result {
+		return errors.New("no results")
+	}
 
 	return nil
 }
